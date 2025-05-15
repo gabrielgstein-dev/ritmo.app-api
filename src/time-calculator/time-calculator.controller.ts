@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { TimeCalculatorService } from './time-calculator.service';
+import { TimeCalculatorService, TimeCalculationOptions } from './time-calculator.service';
 
 class CalculateExitTimeDto {
   entryTime: string;
@@ -23,6 +23,7 @@ class CalculateExtraHoursDto {
   exitTime: string;
   returnToWorkTime: string;
   finalExitTime: string;
+  options?: TimeCalculationOptions;
 }
 
 @Controller('time-calculator')
@@ -67,6 +68,7 @@ export class TimeCalculatorController {
         body.exitTime,
         body.returnToWorkTime,
         body.finalExitTime,
+        body.options
       ),
     };
   }

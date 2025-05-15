@@ -26,6 +26,7 @@ class CalculateExtraHoursDto {
   exitTime: string;
   returnToWorkTime: string;
   finalExitTime: string;
+  options?: TimeCalculationOptions;
 }
 
 @Controller('time-calculator')
@@ -72,6 +73,7 @@ export class TimeCalculatorController {
         body.exitTime,
         body.returnToWorkTime,
         body.finalExitTime,
+        body.options
       ),
     };
   }

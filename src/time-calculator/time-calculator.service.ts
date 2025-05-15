@@ -91,6 +91,7 @@ export class TimeCalculatorService {
     exitTime: string,
     returnToWorkTime: string,
     finalExitTime: string,
+    options?: TimeCalculationOptions
   ): ExtraHoursResult {
     // Converter todos os horários para minutos
     const entryMinutes = this.timeToMinutes(entryTime);
@@ -109,7 +110,7 @@ export class TimeCalculatorService {
     const extraWorkMinutes = finalExitMinutes - returnToWorkMinutes;
 
     // Calcular diferença entre jornada padrão e jornada realizada
-    const standardWorkMinutes = this.WORK_HOURS * 60;
+    const standardWorkMinutes = this.getWorkHours(options) * 60;
     const totalWorkMinutes = regularWorkMinutes + extraWorkMinutes;
     const diffMinutes = totalWorkMinutes - standardWorkMinutes;
 

@@ -1,19 +1,22 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { TimeCalculatorService } from './time-calculator.service';
+import { TimeCalculatorService, TimeCalculationOptions } from './time-calculator.service';
 
 class CalculateExitTimeDto {
   entryTime: string;
+  options?: TimeCalculationOptions;
 }
 
 class CalculateLunchReturnTimeDto {
   entryTime: string;
   lunchTime: string;
+  options?: TimeCalculationOptions;
 }
 
 class CalculateExitTimeWithLunchDto {
   entryTime: string;
   lunchTime: string;
   returnTime: string;
+  options?: TimeCalculationOptions;
 }
 
 class CalculateExtraHoursDto {
@@ -32,7 +35,7 @@ export class TimeCalculatorController {
   @Post('exit-time')
   calculateExitTime(@Body() body: CalculateExitTimeDto) {
     return {
-      result: this.timeCalculatorService.calculateExitTime(body.entryTime),
+      result: this.timeCalculatorService.calculateExitTime(body.entryTime, body.options),
     };
   }
 
@@ -42,6 +45,7 @@ export class TimeCalculatorController {
       result: this.timeCalculatorService.calculateLunchReturnTime(
         body.entryTime,
         body.lunchTime,
+        body.options
       ),
     };
   }
@@ -53,6 +57,7 @@ export class TimeCalculatorController {
         body.entryTime,
         body.lunchTime,
         body.returnTime,
+        body.options
       ),
     };
   }

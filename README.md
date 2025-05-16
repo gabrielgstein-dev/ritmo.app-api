@@ -1,99 +1,348 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# API Ponto - Documentação
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Visão Geral
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API Ponto é um sistema de gerenciamento de ponto eletrônico desenvolvido com NestJS. Esta API permite o registro, consulta e gerenciamento de pontos eletrônicos de forma eficiente e segura. O sistema inclui uma calculadora de tempo avançada que ajuda a determinar horários de saída, intervalos de almoço e horas extras com base em diferentes parâmetros de entrada.
 
-## Description
+![Versão](https://img.shields.io/badge/versão-1.0.0-blue)
+![Licença](https://img.shields.io/badge/licença-MIT-green)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Índice
 
-## Project setup
+- [API Ponto - Documentação](#api-ponto---documentação)
+  - [Visão Geral](#visão-geral)
+  - [Índice](#índice)
+  - [Requisitos](#requisitos)
+  - [Instalação](#instalação)
+  - [Configuração](#configuração)
+  - [Configuração Adicional](#configuração-adicional)
+    - [Instalando o Swagger para Documentação da API](#instalando-o-swagger-para-documentação-da-api)
+  - [Executando a Aplicação](#executando-a-aplicação)
+  - [Endpoints da API](#endpoints-da-api)
+    - [Endpoints de Autenticação](#endpoints-de-autenticação)
+    - [Usuários](#usuários)
+    - [Registros de Ponto](#registros-de-ponto)
+    - [Calculadora de Tempo](#calculadora-de-tempo)
+  - [Autenticação](#autenticação)
+  - [Modelos de Dados](#modelos-de-dados)
+    - [Modelo de Usuário](#modelo-de-usuário)
+    - [Modelo de Registro de Ponto](#modelo-de-registro-de-ponto)
+    - [Modelos da Calculadora de Tempo](#modelos-da-calculadora-de-tempo)
+      - [Calcular Horário de Saída](#calcular-horário-de-saída)
+      - [Calcular Horas Extras](#calcular-horas-extras)
+  - [Testes](#testes)
+  - [Deploy no Render](#deploy-no-render)
+  - [Tecnologias](#tecnologias)
+  - [Contribuição](#contribuição)
+  - [Licença](#licença)
 
-```bash
-$ npm install
-```
+## Requisitos
 
-## Compile and run the project
+- Node.js (v14 ou superior)
+- PNPM (v7 ou superior)
+- PostgreSQL (opcional, dependendo da configuração)
 
-```bash
-# development
-$ npm run start
+## Instalação
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Este projeto utiliza pnpm como gerenciador de pacotes.
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+# Instalar pnpm globalmente (se ainda não tiver)
+$ npm install -g pnpm
+
+# Clonar o repositório
+$ git clone https://github.com/seu-usuario/ponto-api.git
+$ cd ponto-api
+
+# Instalar dependências
+$ pnpm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Configuração
 
-## Resources
+1. Crie um arquivo `.env` na raiz do projeto baseado no arquivo `.env.example`:
 
-Check out a few resources that may come in handy when working with NestJS:
+```env
+# Servidor
+PORT=3001
+NODE_ENV=development
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Banco de dados
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/ponto_db
 
-## Support
+# CORS
+CORS_ORIGIN=http://localhost:3000
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Configure as variáveis de ambiente de acordo com seu ambiente de desenvolvimento.
 
-## Stay in touch
+## Configuração Adicional
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Instalando o Swagger para Documentação da API
 
-## License
+Para adicionar documentação interativa à API usando Swagger:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+1. Instale as dependências necessárias:
+
+```bash
+pnpm add @nestjs/swagger swagger-ui-express
+```
+
+1. Configure o Swagger no arquivo `main.ts`:
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // Configuração do Swagger
+  const config = new DocumentBuilder()
+    .setTitle('API Ponto')
+    .setDescription('API para gerenciamento de ponto eletrônico')
+    .setVersion('1.0')
+    .addTag('ponto')
+    .addTag('time-calculator')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
+  // Configuração do CORS para permitir acesso do frontend
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  });
+
+  // Porta definida pelo ambiente ou padrão 3001
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+
+  console.log(`Aplicação rodando na porta ${port}`);
+  console.log(`Documentação disponível em: http://localhost:${port}/api/docs`);
+}
+bootstrap();
+```
+
+1. Adicione decoradores nos DTOs e controladores para melhorar a documentação. Exemplo:
+
+```typescript
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
+
+class CalculateExitTimeDto {
+  @ApiProperty({ example: '08:00', description: 'Horário de entrada (formato HH:MM)' })
+  entryTime: string;
+}
+
+@ApiTags('time-calculator')
+@Controller('time-calculator')
+export class TimeCalculatorController {
+  // ... implementação do controlador
+}
+```
+
+## Executando a Aplicação
+
+```bash
+# Desenvolvimento
+$ pnpm start
+
+# Modo de observação (watch mode)
+$ pnpm start:dev
+
+# Modo de produção
+$ pnpm start:prod
+```
+
+## Endpoints da API
+
+A API oferece os seguintes endpoints principais:
+
+### Endpoints de Autenticação
+
+- `POST /auth/login` - Autenticar usuário
+- `POST /auth/register` - Registrar novo usuário
+
+### Usuários
+
+- `GET /users` - Listar todos os usuários
+- `GET /users/:id` - Obter detalhes de um usuário
+- `PUT /users/:id` - Atualizar um usuário
+- `DELETE /users/:id` - Remover um usuário
+
+### Registros de Ponto
+
+- `POST /pontos` - Registrar um novo ponto
+- `GET /pontos` - Listar todos os pontos
+- `GET /pontos/:id` - Obter detalhes de um registro de ponto
+- `PUT /pontos/:id` - Atualizar um registro de ponto
+- `DELETE /pontos/:id` - Remover um registro de ponto
+
+### Calculadora de Tempo
+
+- `POST /time-calculator/exit-time` - Calcula o horário de saída com base no horário de entrada
+- `POST /time-calculator/lunch-return-time` - Calcula o horário de retorno do almoço
+- `POST /time-calculator/exit-time-with-lunch` - Calcula o horário de saída considerando o intervalo de almoço
+- `POST /time-calculator/extra-hours` - Calcula as horas extras trabalhadas
+
+Para uma documentação completa dos endpoints, você pode implementar o Swagger seguindo as instruções na seção de configuração adicional.
+
+## Autenticação
+
+A API utiliza autenticação JWT (JSON Web Token). Para acessar endpoints protegidos, é necessário incluir o token no cabeçalho da requisição:
+
+```http
+Authorization: Bearer {seu_token_jwt}
+```
+
+## Modelos de Dados
+
+### Modelo de Usuário
+
+```json
+{
+  "id": "uuid",
+  "nome": "string",
+  "email": "string",
+  "cargo": "string",
+  "departamento": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+```
+
+### Modelo de Registro de Ponto
+
+```json
+{
+  "id": "uuid",
+  "userId": "uuid",
+  "tipo": "ENTRADA | SAIDA",
+  "dataHora": "datetime",
+  "localizacao": {
+    "latitude": "number",
+    "longitude": "number"
+  },
+  "observacao": "string",
+  "createdAt": "datetime",
+  "updatedAt": "datetime"
+}
+```
+
+### Modelos da Calculadora de Tempo
+
+#### Calcular Horário de Saída
+
+**Requisição:**
+
+```json
+{
+  "entryTime": "08:00",
+  "options": {
+    "standardWorkHours": 8,
+    "standardLunchBreak": 1
+  }
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "result": {
+    "hours": 16,
+    "minutes": 0,
+    "formattedTime": "16:00"
+  }
+}
+```
+
+#### Calcular Horas Extras
+
+**Requisição:**
+
+```json
+{
+  "entryTime": "08:00",
+  "lunchTime": "12:00",
+  "returnTime": "13:00",
+  "exitTime": "18:00",
+  "returnToWorkTime": "19:00",
+  "finalExitTime": "21:00",
+  "options": {
+    "standardWorkHours": 8
+  }
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "result": {
+    "extraHours": 2,
+    "extraMinutes": 0,
+    "formattedTime": "02:00",
+    "isExtra": true
+  }
+}
+```
+
+## Testes
+
+```bash
+# Testes unitários
+$ pnpm test
+
+# Testes e2e
+$ pnpm test:e2e
+
+# Cobertura de testes
+$ pnpm test:cov
+```
+
+## Deploy no Render
+
+Este projeto está configurado para ser facilmente implantado no Render usando pnpm. Siga os passos abaixo:
+
+1. Crie uma conta no [Render](https://render.com) se ainda não tiver uma
+2. No Dashboard do Render, clique em "New" e selecione "Web Service"
+3. Conecte seu repositório GitHub/GitLab/Bitbucket
+4. Configure o serviço:
+   - **Nome**: Escolha um nome para seu serviço (ex: ponto-backend)
+   - **Região**: Selecione a região mais próxima dos seus usuários
+   - **Branch**: Selecione a branch principal (main/master)
+   - **Runtime**: Node
+   - **Build Command**: `npm install -g pnpm && pnpm install && pnpm build`
+   - **Start Command**: `pnpm start:prod`
+5. Configure as variáveis de ambiente:
+   - `NODE_ENV`: production
+   - `PORT`: 10000 (o Render usará esta porta internamente)
+   - `CORS_ORIGIN`: URL do seu frontend (ex: "https://ponto-frontend.onrender.com")
+   - Adicione outras variáveis necessárias como conexão com banco de dados
+6. Clique em "Create Web Service"
+
+O arquivo `render.yaml` na raiz do projeto já contém as configurações necessárias para o deploy automático usando pnpm.
+
+## Tecnologias
+
+- [NestJS](https://nestjs.com/) - Framework Node.js para construir aplicações server-side
+- [TypeScript](https://www.typescriptlang.org/) - Superset JavaScript com tipagem estática
+- [PostgreSQL](https://www.postgresql.org/) - Sistema de gerenciamento de banco de dados relacional
+- [TypeORM](https://typeorm.io/) - ORM para TypeScript e JavaScript
+- [JWT](https://jwt.io/) - JSON Web Token para autenticação
+
+## Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.

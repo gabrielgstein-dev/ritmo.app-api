@@ -102,7 +102,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('API Ponto')
     .setDescription('API para gerenciamento de ponto eletrônico')
-    .setVersion('1.0')
+    .setVersion('1.1.0')
     .addTag('ponto')
     .addTag('time-calculator')
     .addBearerAuth()

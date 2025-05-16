@@ -12,7 +12,7 @@ API Ponto é um sistema de gerenciamento de ponto eletrônico desenvolvido com N
 
 ## Índice
 
-- [API Ponto - Documentação](#api-ponto---documentação)
+- [API Ponto - Documentação (BETA)](#api-ponto---documentação-beta)
   - [Visão Geral](#visão-geral)
   - [Índice](#índice)
   - [Requisitos](#requisitos)

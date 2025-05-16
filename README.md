@@ -1,10 +1,13 @@
-# API Ponto - Documentação
+# API Ponto - Documentação (BETA)
 
 ## Visão Geral
 
 API Ponto é um sistema de gerenciamento de ponto eletrônico desenvolvido com NestJS. Esta API permite o registro, consulta e gerenciamento de pontos eletrônicos de forma eficiente e segura. O sistema inclui uma calculadora de tempo avançada que ajuda a determinar horários de saída, intervalos de almoço e horas extras com base em diferentes parâmetros de entrada.
 
-![Versão](https://img.shields.io/badge/versão-1.0.0-blue)
+> **Nota:** Esta API está atualmente em fase Beta e pode sofrer alterações significativas.
+
+![Versão](https://img.shields.io/badge/versão-0.9.0--beta-orange)
+![Status](https://img.shields.io/badge/status-beta-orange)
 ![Licença](https://img.shields.io/badge/licença-MIT-green)
 
 ## Índice
@@ -335,13 +338,97 @@ O arquivo `render.yaml` na raiz do projeto já contém as configurações necess
 - [TypeORM](https://typeorm.io/) - ORM para TypeScript e JavaScript
 - [JWT](https://jwt.io/) - JSON Web Token para autenticação
 
+## Fluxo de Desenvolvimento (GitFlow)
+
+Este projeto segue o modelo GitFlow para gerenciamento de branches e releases. O GitFlow define uma estrutura de ramificação específica para facilitar o desenvolvimento colaborativo e o controle de versões.
+
+### Estrutura de Branches
+
+- **main**: Código estável de produção
+- **develop**: Branch de integração para o próximo release
+- **feature/\***: Desenvolvimento de novas funcionalidades
+- **release/\***: Preparação de releases
+- **hotfix/\***: Correções rápidas em produção
+
+### Fluxo de Trabalho
+
+#### Desenvolvimento de Funcionalidades
+
+```bash
+# Criar uma nova branch de feature
+git flow feature start nome-da-feature
+
+# Desenvolver a funcionalidade e fazer commits
+
+# Finalizar a feature
+git flow feature finish nome-da-feature
+```
+
+#### Correção de Bugs em Produção
+
+```bash
+# Criar uma nova branch de hotfix
+git flow hotfix start nome-do-hotfix
+
+# Corrigir o bug
+
+# Finalizar o hotfix
+git flow hotfix finish nome-do-hotfix
+```
+
+### Processo de Release Automatizado
+
+O projeto conta com um script automatizado para gerenciar releases seguindo o versionamento semântico (SemVer). O script `release.sh` calcula automaticamente a próxima versão com base no tipo de release e atualiza todos os arquivos necessários.
+
+#### Versionamento Semântico (SemVer)
+
+O versionamento segue o padrão X.Y.Z, onde:
+
+- **X (major)**: Mudanças incompatíveis com versões anteriores
+- **Y (minor)**: Adição de funcionalidades com compatibilidade
+- **Z (patch)**: Correções de bugs com compatibilidade
+
+#### Comandos de Release
+
+Para facilitar o processo de release, foram adicionados scripts no `package.json` que podem ser executados com pnpm:
+
+```bash
+# Release de correção de bugs (incrementa o patch)
+pnpm release:patch "Corrige bug no cálculo de horas extras"
+
+# Release com novas funcionalidades (incrementa o minor)
+pnpm release:minor "Adiciona funcionalidade de relatórios"
+
+# Release com mudanças incompatíveis (incrementa o major)
+pnpm release:major "Refatora API com nova estrutura"
+```
+
+O script de release automaticamente:
+
+1. Calcula a próxima versão com base na versão atual
+2. Cria uma branch de release
+3. Atualiza a versão no `package.json` e no README
+4. Faz commit das alterações
+5. Finaliza a release, mesclando as alterações nas branches `main` e `develop`
+6. Cria uma tag para a versão
+
+#### Enviando a Release para o Repositório Remoto
+
+Após finalizar a release, é necessário enviar as alterações para o repositório remoto:
+
+```bash
+git push origin develop
+git push origin main
+git push --tags
+```
+
 ## Contribuição
 
 1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+2. Crie uma branch para sua feature (`git flow feature start nova-feature`)
 3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`)
-4. Faça push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+4. Finalize a feature (`git flow feature finish nova-feature`)
+5. Abra um Pull Request para a branch `develop`
 
 ## Licença
 

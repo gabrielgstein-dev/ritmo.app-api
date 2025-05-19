@@ -1,38 +1,23 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { TimeCalculatorService, TimeCalculationOptions } from './time-calculator.service';
+import { TimeCalculatorService } from './time-calculator.service';
+import {
+  CalculateExitTimeDto,
+  CalculateLunchReturnTimeDto,
+  CalculateExitTimeWithLunchDto,
+  CalculateExtraHoursDto,
+  TimeResultDto,
+  ExtraHoursResultDto
+} from './dto/time-calculator.dto';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '../swagger-types';
 
-class CalculateExitTimeDto {
-  entryTime: string;
-  options?: TimeCalculationOptions;
-}
-
-class CalculateLunchReturnTimeDto {
-  entryTime: string;
-  lunchTime: string;
-  options?: TimeCalculationOptions;
-}
-
-class CalculateExitTimeWithLunchDto {
-  entryTime: string;
-  lunchTime: string;
-  returnTime: string;
-  options?: TimeCalculationOptions;
-}
-
-class CalculateExtraHoursDto {
-  entryTime: string;
-  lunchTime: string;
-  returnTime: string;
-  exitTime: string;
-  returnToWorkTime: string;
-  finalExitTime: string;
-  options?: TimeCalculationOptions;
-}
-
+@ApiTags('time-calculator')
 @Controller('time-calculator')
 export class TimeCalculatorController {
   constructor(private readonly timeCalculatorService: TimeCalculatorService) {}
 
+  @ApiOperation({ summary: 'Calcular horário de saída' })
+  @ApiBody({ type: CalculateExitTimeDto })
+  @ApiResponse({ status: 200, description: 'Horário de saída calculado com sucesso', type: TimeResultDto })
   @Post('exit-time')
   calculateExitTime(@Body() body: CalculateExitTimeDto) {
     return {
@@ -40,6 +25,9 @@ export class TimeCalculatorController {
     };
   }
 
+  @ApiOperation({ summary: 'Calcular horário de retorno do almoço' })
+  @ApiBody({ type: CalculateLunchReturnTimeDto })
+  @ApiResponse({ status: 200, description: 'Horário de retorno do almoço calculado com sucesso', type: TimeResultDto })
   @Post('lunch-return-time')
   calculateLunchReturnTime(@Body() body: CalculateLunchReturnTimeDto) {
     return {
@@ -51,6 +39,9 @@ export class TimeCalculatorController {
     };
   }
 
+  @ApiOperation({ summary: 'Calcular horário de saída considerando almoço' })
+  @ApiBody({ type: CalculateExitTimeWithLunchDto })
+  @ApiResponse({ status: 200, description: 'Horário de saída calculado com sucesso', type: TimeResultDto })
   @Post('exit-time-with-lunch')
   calculateExitTimeWithLunch(@Body() body: CalculateExitTimeWithLunchDto) {
     return {
@@ -63,6 +54,9 @@ export class TimeCalculatorController {
     };
   }
 
+  @ApiOperation({ summary: 'Calcular horas extras' })
+  @ApiBody({ type: CalculateExtraHoursDto })
+  @ApiResponse({ status: 200, description: 'Horas extras calculadas com sucesso', type: ExtraHoursResultDto })
   @Post('extra-hours')
   calculateExtraHours(@Body() body: CalculateExtraHoursDto) {
     return {

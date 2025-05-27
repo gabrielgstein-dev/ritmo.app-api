@@ -8,7 +8,7 @@ import {
   TimeResultDto,
   ExtraHoursResultDto
 } from './dto/time-calculator.dto';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '../swagger-types';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('time-calculator')
 @Controller('time-calculator')

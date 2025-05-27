@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SwaggerModule } from './swagger-types';
-import { swaggerConfig } from './swagger.config';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,7 +13,15 @@ async function bootstrap() {
   });
 
   // Configuração do Swagger
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  const config = new DocumentBuilder()
+    .setTitle('API de Cálculo de Tempo')
+    .setDescription(
+      'API para cálculo de horários de trabalho, almoço e horas extras',
+    )
+    .setVersion('1.0')
+    .addTag('time-calculator', 'Endpoints para cálculo de tempo')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
   // Porta definida pelo ambiente ou padrão 3001
@@ -22,6 +29,8 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`Aplicação rodando na porta ${port}`);
-  console.log(`Documentação Swagger disponível em: http://localhost:${port}/api/docs`);
+  console.log(
+    `Documentação Swagger disponível em: http://localhost:${port}/api/docs`,
+  );
 }
 bootstrap();

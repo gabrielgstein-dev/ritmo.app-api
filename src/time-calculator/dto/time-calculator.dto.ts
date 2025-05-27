@@ -1,5 +1,5 @@
 import { TimeCalculationOptions } from '../time-calculator.service';
-import { ApiProperty } from '../../swagger-types';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CalculateExitTimeDto {
   @ApiProperty({ description: 'Horário de entrada (formato HH:MM)', example: '08:00' })

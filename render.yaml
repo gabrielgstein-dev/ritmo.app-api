@@ -11,4 +11,4 @@ services:
       - key: PORT
         value: 10000
       - key: CORS_ORIGIN
-        value: https://ponto-frontend.onrender.com # Ajuste para o URL do seu frontend quando estiver disponível
+        value: https://ponto-frontend.onrender.com,https://ritmo-app-web.vercel.app # URLs dos frontends

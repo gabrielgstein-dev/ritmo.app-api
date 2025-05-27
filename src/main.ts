@@ -7,8 +7,14 @@ async function bootstrap() {
 
   // Configuração do CORS para permitir acesso do frontend
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    methods: ['GET', 'POST'],
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : [
+          'http://localhost:3000',
+          'https://ponto-frontend.onrender.com',
+          'https://ritmo-app-web.vercel.app',
+        ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
 

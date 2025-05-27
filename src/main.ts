@@ -13,6 +13,7 @@ async function bootstrap() {
           'http://localhost:3000',
           'https://ponto-frontend.onrender.com',
           'https://ritmo-app-web.vercel.app',
+          'https://ritmo.click',
         ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,

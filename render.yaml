@@ -10,16 +10,8 @@ services:
         value: qa
       - key: PORT
         value: 10000
-      - key: DB_HOST
-        value: dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com
-      - key: DB_PORT
-        value: 5432
-      - key: DB_USERNAME
-        value: ritmodb_user
-      - key: DB_PASSWORD
-        value: mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp
-      - key: DB_DATABASE
-        value: ritmodb
+      - key: DATABASE_URL
+        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb
       - key: DB_SYNCHRONIZE
         value: true
       - key: DB_MIGRATIONS_RUN

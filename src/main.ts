@@ -1,3 +1,6 @@
+
+import './polyfills';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -5,7 +8,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configuração do CORS para permitir acesso do frontend
+
   app.enableCors({
     origin: process.env.CORS_ORIGIN
       ? process.env.CORS_ORIGIN.split(',')
@@ -19,7 +22,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Configuração do Swagger
+
   const config = new DocumentBuilder()
     .setTitle('API de Cálculo de Tempo')
     .setDescription(
@@ -31,7 +34,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  // Porta definida pelo ambiente ou padrão 3001
+
   const port = process.env.PORT || 3001;
   await app.listen(port);
 

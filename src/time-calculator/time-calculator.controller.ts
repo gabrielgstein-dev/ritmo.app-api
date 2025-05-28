@@ -1,4 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from '../users/entities/user.entity';
 import { TimeCalculatorService } from './time-calculator.service';
 import {
   CalculateExitTimeDto,
@@ -8,6 +11,7 @@ import {
   TimeResultDto,
   ExtraHoursResultDto
 } from './dto/time-calculator.dto';
+import { SaveTimeRecordDto } from './dto/save-time-record.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('time-calculator')
@@ -19,9 +23,12 @@ export class TimeCalculatorController {
   @ApiBody({ type: CalculateExitTimeDto })
   @ApiResponse({ status: 200, description: 'Horário de saída calculado com sucesso', type: TimeResultDto })
   @Post('exit-time')
-  calculateExitTime(@Body() body: CalculateExitTimeDto) {
+  async calculateExitTime(
+    @Body() body: CalculateExitTimeDto,
+    @GetUser() user?: User
+  ) {
     return {
-      result: this.timeCalculatorService.calculateExitTime(body.entryTime, body.options),
+      result: await this.timeCalculatorService.calculateExitTime(body.entryTime, body.options, user),
     };
   }
 
@@ -29,12 +36,16 @@ export class TimeCalculatorController {
   @ApiBody({ type: CalculateLunchReturnTimeDto })
   @ApiResponse({ status: 200, description: 'Horário de retorno do almoço calculado com sucesso', type: TimeResultDto })
   @Post('lunch-return-time')
-  calculateLunchReturnTime(@Body() body: CalculateLunchReturnTimeDto) {
+  async calculateLunchReturnTime(
+    @Body() body: CalculateLunchReturnTimeDto,
+    @GetUser() user?: User
+  ) {
     return {
-      result: this.timeCalculatorService.calculateLunchReturnTime(
+      result: await this.timeCalculatorService.calculateLunchReturnTime(
         body.entryTime,
         body.lunchTime,
-        body.options
+        body.options,
+        user
       ),
     };
   }
@@ -43,13 +54,17 @@ export class TimeCalculatorController {
   @ApiBody({ type: CalculateExitTimeWithLunchDto })
   @ApiResponse({ status: 200, description: 'Horário de saída calculado com sucesso', type: TimeResultDto })
   @Post('exit-time-with-lunch')
-  calculateExitTimeWithLunch(@Body() body: CalculateExitTimeWithLunchDto) {
+  async calculateExitTimeWithLunch(
+    @Body() body: CalculateExitTimeWithLunchDto,
+    @GetUser() user?: User
+  ) {
     return {
-      result: this.timeCalculatorService.calculateExitTimeWithLunch(
+      result: await this.timeCalculatorService.calculateExitTimeWithLunch(
         body.entryTime,
         body.lunchTime,
         body.returnTime,
-        body.options
+        body.options,
+        user
       ),
     };
   }
@@ -58,16 +73,44 @@ export class TimeCalculatorController {
   @ApiBody({ type: CalculateExtraHoursDto })
   @ApiResponse({ status: 200, description: 'Horas extras calculadas com sucesso', type: ExtraHoursResultDto })
   @Post('extra-hours')
-  calculateExtraHours(@Body() body: CalculateExtraHoursDto) {
+  async calculateExtraHours(
+    @Body() body: CalculateExtraHoursDto,
+    @GetUser() user?: User
+  ) {
     return {
-      result: this.timeCalculatorService.calculateExtraHours(
+      result: await this.timeCalculatorService.calculateExtraHours(
         body.entryTime,
         body.lunchTime,
         body.returnTime,
         body.exitTime,
         body.returnToWorkTime,
         body.finalExitTime,
-        body.options
+        body.options,
+        user
+      ),
+    };
+  }
+
+  @ApiOperation({ summary: 'Salvar registro de ponto' })
+  @ApiBody({ type: SaveTimeRecordDto })
+  @ApiResponse({ status: 201, description: 'Registro de ponto salvo com sucesso' })
+  @UseGuards(JwtAuthGuard)
+  @Post('save-time-record')
+  async saveTimeRecord(
+    @Body() body: SaveTimeRecordDto,
+    @GetUser() user: User
+  ) {
+    return {
+      result: await this.timeCalculatorService.saveTimeRecord(
+        user,
+        body.date,
+        body.entryTime,
+        body.lunchTime,
+        body.returnTime,
+        body.exitTime,
+        body.companyId,
+        body.returnToWorkTime,
+        body.finalExitTime
       ),
     };
   }

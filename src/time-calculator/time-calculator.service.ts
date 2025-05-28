@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Company } from '../companies/entities/company.entity';
+import { User } from '../users/entities/user.entity';
+import { TimeRecord } from '../time-records/entities/time-record.entity';
 
 export interface TimeResult {
   hours: number;
@@ -16,12 +21,56 @@ export interface ExtraHoursResult {
 export interface TimeCalculationOptions {
   standardWorkHours?: number;
   standardLunchBreak?: number;
+  companyId?: number;
 }
 
 @Injectable()
 export class TimeCalculatorService {
-  private readonly WORK_HOURS = 8; // Jornada de trabalho padrão (8 horas)
-  private readonly LUNCH_BREAK = 1; // Intervalo de almoço padrão (1 hora)
+  private readonly WORK_HOURS = 8;
+  private readonly LUNCH_BREAK = 1;
+  
+  constructor(
+    @InjectRepository(Company)
+    private companiesRepository: Repository<Company>,
+    @InjectRepository(TimeRecord)
+    private timeRecordsRepository: Repository<TimeRecord>,
+  ) {}
+  
+  private async getCompanySettings(options?: TimeCalculationOptions, user?: User): Promise<{ workHours: number; lunchBreak: number }> {
+
+    if (!options?.companyId) {
+      return {
+        workHours: options?.standardWorkHours || this.WORK_HOURS,
+        lunchBreak: options?.standardLunchBreak || this.LUNCH_BREAK,
+      };
+    }
+
+
+    const company = await this.companiesRepository.findOne({
+      where: { id: options.companyId },
+      relations: ['users'],
+    });
+
+    if (!company) {
+      return {
+        workHours: options?.standardWorkHours || this.WORK_HOURS,
+        lunchBreak: options?.standardLunchBreak || this.LUNCH_BREAK,
+      };
+    }
+
+
+    if (user) {
+      const hasAccess = company.users.some(companyUser => companyUser.id === user.id);
+      if (!hasAccess) {
+        throw new ForbiddenException('Você não tem acesso a esta empresa');
+      }
+    }
+
+    return {
+      workHours: company.workHours,
+      lunchBreak: company.lunchBreak,
+    };
+  }
   
   private getWorkHours(options?: TimeCalculationOptions): number {
     return options?.standardWorkHours || this.WORK_HOURS;
@@ -31,69 +80,103 @@ export class TimeCalculatorService {
     return options?.standardLunchBreak || this.LUNCH_BREAK;
   }
 
-  calculateExitTime(entryTime: string, options?: TimeCalculationOptions): TimeResult {
+  async calculateExitTime(entryTime: string, options?: TimeCalculationOptions, user?: User): Promise<TimeResult> {
+
+    let workHours = this.WORK_HOURS;
+    if (options?.companyId && user) {
+      const settings = await this.getCompanySettings(options, user);
+      workHours = settings.workHours;
+    } else {
+      workHours = this.getWorkHours(options);
+    }
     const [hours, minutes] = entryTime.split(':').map(Number);
     const entryDate = new Date();
     entryDate.setHours(hours, minutes, 0, 0);
 
     const exitDate = new Date(entryDate);
-    exitDate.setHours(exitDate.getHours() + this.getWorkHours(options));
+    exitDate.setHours(exitDate.getHours() + workHours);
 
     return this.formatTimeResult(exitDate.getHours(), exitDate.getMinutes());
   }
 
-  calculateLunchReturnTime(entryTime: string, lunchTime: string, options?: TimeCalculationOptions): TimeResult {
+  async calculateLunchReturnTime(entryTime: string, lunchTime: string, options?: TimeCalculationOptions, user?: User): Promise<TimeResult> {
+
+    let lunchBreak = this.LUNCH_BREAK;
+    if (options?.companyId && user) {
+      const settings = await this.getCompanySettings(options, user);
+      lunchBreak = settings.lunchBreak;
+    } else {
+      lunchBreak = this.getLunchBreak(options);
+    }
     const [lunchHours, lunchMinutes] = lunchTime.split(':').map(Number);
     const lunchDate = new Date();
     lunchDate.setHours(lunchHours, lunchMinutes, 0, 0);
 
     const returnDate = new Date(lunchDate);
-    returnDate.setHours(returnDate.getHours() + this.getLunchBreak(options));
+    returnDate.setHours(returnDate.getHours() + lunchBreak);
 
     return this.formatTimeResult(returnDate.getHours(), returnDate.getMinutes());
   }
 
-  calculateExitTimeWithLunch(
+  async calculateExitTimeWithLunch(
     entryTime: string,
     lunchTime: string,
     returnTime: string,
-    options?: TimeCalculationOptions
-  ): TimeResult {
+    options?: TimeCalculationOptions,
+    user?: User
+  ): Promise<TimeResult> {
+
+    let workHours = this.WORK_HOURS;
+    if (options?.companyId && user) {
+      const settings = await this.getCompanySettings(options, user);
+      workHours = settings.workHours;
+    } else {
+      workHours = this.getWorkHours(options);
+    }
     const [entryHours, entryMinutes] = entryTime.split(':').map(Number);
     const [lunchHours, lunchMinutes] = lunchTime.split(':').map(Number);
     const [returnHours, returnMinutes] = returnTime.split(':').map(Number);
 
-    // Converter para minutos para facilitar o cálculo
+
     const entryMinutesTotal = entryHours * 60 + entryMinutes;
     const lunchMinutesTotal = lunchHours * 60 + lunchMinutes;
     const returnMinutesTotal = returnHours * 60 + returnMinutes;
 
-    // Calcular o tempo trabalhado antes do almoço
+
     const beforeLunchMinutes = lunchMinutesTotal - entryMinutesTotal;
 
-    // Calcular o tempo restante para completar a jornada
-    const remainingMinutes = this.getWorkHours(options) * 60 - beforeLunchMinutes;
 
-    // Calcular o horário de saída
+    const remainingMinutes = workHours * 60 - beforeLunchMinutes;
+
+
     const exitMinutesTotal = returnMinutesTotal + remainingMinutes;
 
-    // Converter de volta para horas e minutos
+
     const exitHours = Math.floor(exitMinutesTotal / 60);
     const exitMinutes = exitMinutesTotal % 60;
 
     return this.formatTimeResult(exitHours, exitMinutes);
   }
 
-  calculateExtraHours(
+  async calculateExtraHours(
     entryTime: string,
     lunchTime: string,
     returnTime: string,
     exitTime: string,
     returnToWorkTime: string,
     finalExitTime: string,
-    options?: TimeCalculationOptions
-  ): ExtraHoursResult {
-    // Converter todos os horários para minutos
+    options?: TimeCalculationOptions,
+    user?: User
+  ): Promise<ExtraHoursResult> {
+
+    let workHours = this.WORK_HOURS;
+    if (options?.companyId && user) {
+      const settings = await this.getCompanySettings(options, user);
+      workHours = settings.workHours;
+    } else {
+      workHours = this.getWorkHours(options);
+    }
+
     const entryMinutes = this.timeToMinutes(entryTime);
     const lunchMinutes = this.timeToMinutes(lunchTime);
     const returnFromLunchMinutes = this.timeToMinutes(returnTime);
@@ -101,20 +184,20 @@ export class TimeCalculatorService {
     const returnToWorkMinutes = this.timeToMinutes(returnToWorkTime);
     const finalExitMinutes = this.timeToMinutes(finalExitTime);
 
-    // Calcular tempo total trabalhado na jornada normal
+
     const beforeLunchMinutes = lunchMinutes - entryMinutes;
     const afterLunchMinutes = exitMinutes - returnFromLunchMinutes;
     const regularWorkMinutes = beforeLunchMinutes + afterLunchMinutes;
 
-    // Calcular tempo trabalhado após retorno
+
     const extraWorkMinutes = finalExitMinutes - returnToWorkMinutes;
 
-    // Calcular diferença entre jornada padrão e jornada realizada
-    const standardWorkMinutes = this.getWorkHours(options) * 60;
+
+    const standardWorkMinutes = workHours * 60;
     const totalWorkMinutes = regularWorkMinutes + extraWorkMinutes;
     const diffMinutes = totalWorkMinutes - standardWorkMinutes;
 
-    // Determinar se houve hora extra ou faltante
+
     const isExtra = diffMinutes > 0;
     const absDiffMinutes = Math.abs(diffMinutes);
     const diffHours = Math.floor(absDiffMinutes / 60);
@@ -136,7 +219,7 @@ export class TimeCalculatorService {
   }
 
   private formatTimeResult(hours: number, minutes: number): TimeResult {
-    // Ajustar para formato 24h se necessário
+
     const adjustedHours = hours >= 24 ? hours - 24 : hours;
     
     return {
@@ -146,5 +229,49 @@ export class TimeCalculatorService {
         minutes,
       ).padStart(2, '0')}`,
     };
+  }
+
+  async saveTimeRecord(
+    user: User,
+    date: string,
+    entryTime: string,
+    lunchTime: string,
+    returnTime: string,
+    exitTime: string,
+    companyId: number,
+    returnToWorkTime?: string,
+    finalExitTime?: string,
+  ): Promise<TimeRecord> {
+
+    const company = await this.companiesRepository.findOne({
+      where: { id: companyId },
+      relations: ['users'],
+    });
+
+    if (!company) {
+      throw new NotFoundException(`Empresa com ID ${companyId} não encontrada`);
+    }
+
+    const hasAccess = company.users.some(companyUser => companyUser.id === user.id);
+    if (!hasAccess) {
+      throw new ForbiddenException('Você não tem acesso a esta empresa');
+    }
+
+
+    const timeRecord = this.timeRecordsRepository.create({
+      date: new Date(date),
+      entryTime,
+      lunchTime,
+      returnTime,
+      exitTime,
+      returnToWorkTime,
+      finalExitTime,
+      userId: user.id,
+      user,
+      companyId,
+      company,
+    });
+
+    return this.timeRecordsRepository.save(timeRecord);
   }
 }

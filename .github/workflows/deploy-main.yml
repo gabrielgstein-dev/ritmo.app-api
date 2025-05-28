@@ -1,0 +1,81 @@
+name: Deploy to Cloud Run - PROD
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  NODE_ENV: production
+  PORT: 8080
+  
+  # Configurações do Banco de Dados PostgreSQL
+  DB_HOST: ${{ secrets.DB_HOST_PROD }}
+  DB_PORT: ${{ secrets.DB_PORT_PROD }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME_PROD }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD_PROD }}
+  DB_DATABASE: ${{ secrets.DB_DATABASE_PROD }}
+  
+  # Configurações de Migrations e Sincronização
+  DB_SYNCHRONIZE: false
+  DB_MIGRATIONS_RUN: true
+  
+  # Configurações da Aplicação
+  JWT_SECRET: ${{ secrets.JWT_SECRET_PROD }}
+  JWT_EXPIRATION: 1d
+  
+  # Configurações de CORS
+  CORS_ORIGIN: ${{ secrets.CORS_ORIGIN_PROD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Login no Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_PROD }}
+
+      - name: Configurar gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ritmo-app-prod
+
+      - name: Extrair versão da tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build e push da imagem
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+          docker build -t us-central1-docker.pkg.dev/ritmo-app-prod/ritmo-api-prod/api:${{ steps.get_version.outputs.VERSION }} \
+            -t us-central1-docker.pkg.dev/ritmo-app-prod/ritmo-api-prod/api:latest \
+            --file Dockerfile.prod \
+            --build-arg NODE_ENV=${NODE_ENV} \
+            --build-arg PORT=${PORT} \
+            --build-arg DB_HOST=${DB_HOST} \
+            --build-arg DB_PORT=${DB_PORT} \
+            --build-arg DB_USERNAME=${DB_USERNAME} \
+            --build-arg DB_PASSWORD=${DB_PASSWORD} \
+            --build-arg DB_DATABASE=${DB_DATABASE} \
+            --build-arg DB_SYNCHRONIZE=${DB_SYNCHRONIZE} \
+            --build-arg DB_MIGRATIONS_RUN=${DB_MIGRATIONS_RUN} \
+            --build-arg JWT_SECRET=${JWT_SECRET} \
+            --build-arg JWT_EXPIRATION=${JWT_EXPIRATION} \
+            --build-arg CORS_ORIGIN=${CORS_ORIGIN} \
+            .
+          docker push us-central1-docker.pkg.dev/ritmo-app-prod/ritmo-api-prod/api:${{ steps.get_version.outputs.VERSION }}
+          docker push us-central1-docker.pkg.dev/ritmo-app-prod/ritmo-api-prod/api:latest
+
+      - name: Deploy no Cloud Run
+        run: |
+          gcloud run deploy ritmo-api-prod \
+            --image=us-central1-docker.pkg.dev/ritmo-app-prod/ritmo-api-prod/api:${{ steps.get_version.outputs.VERSION }} \
+            --platform=managed \
+            --region=us-central1 \
+            --allow-unauthenticated \
+            --set-env-vars=NODE_ENV=${NODE_ENV},PORT=${PORT},DB_HOST=${DB_HOST},DB_PORT=${DB_PORT},DB_USERNAME=${DB_USERNAME},DB_PASSWORD=${DB_PASSWORD},DB_DATABASE=${DB_DATABASE},DB_SYNCHRONIZE=${DB_SYNCHRONIZE},DB_MIGRATIONS_RUN=${DB_MIGRATIONS_RUN},JWT_SECRET=${JWT_SECRET},JWT_EXPIRATION=${JWT_EXPIRATION},CORS_ORIGIN=${CORS_ORIGIN}

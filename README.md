@@ -34,7 +34,7 @@ API Ponto é um sistema de gerenciamento de ponto eletrônico desenvolvido com N
       - [Calcular Horário de Saída](#calcular-horário-de-saída)
       - [Calcular Horas Extras](#calcular-horas-extras)
   - [Testes](#testes)
-  - [Deploy no Render](#deploy-no-render)
+  - [Deploy no Google Cloud Run](#deploy-no-google-cloud-run)
   - [Tecnologias](#tecnologias)
   - [Contribuição](#contribuição)
   - [Licença](#licença)
@@ -307,28 +307,53 @@ $ pnpm test:e2e
 $ pnpm test:cov
 ```
 
-## Deploy no Render
+## Deploy no Google Cloud Run
 
-Este projeto está configurado para ser facilmente implantado no Render usando pnpm. Siga os passos abaixo:
+Este projeto está configurado para ser implantado no Google Cloud Run usando GitHub Actions. O deploy é acionado automaticamente quando uma nova tag com prefixo 'v' é criada.
 
-1. Crie uma conta no [Render](https://render.com) se ainda não tiver uma
-2. No Dashboard do Render, clique em "New" e selecione "Web Service"
-3. Conecte seu repositório GitHub/GitLab/Bitbucket
-4. Configure o serviço:
-   - **Nome**: Escolha um nome para seu serviço (ex: ponto-backend)
-   - **Região**: Selecione a região mais próxima dos seus usuários
-   - **Branch**: Selecione a branch principal (main/master)
-   - **Runtime**: Node
-   - **Build Command**: `npm install -g pnpm && pnpm install && pnpm build`
-   - **Start Command**: `pnpm start:prod`
-5. Configure as variáveis de ambiente:
-   - `NODE_ENV`: production
-   - `PORT`: 10000 (o Render usará esta porta internamente)
-   - `CORS_ORIGIN`: URL do seu frontend (ex: "https://ponto-frontend.onrender.com")
-   - Adicione outras variáveis necessárias como conexão com banco de dados
-6. Clique em "Create Web Service"
+### Pré-requisitos
 
-O arquivo `render.yaml` na raiz do projeto já contém as configurações necessárias para o deploy automático usando pnpm.
+1. Conta no Google Cloud Platform com um projeto configurado
+2. Repositório no GitHub com GitHub Actions habilitado
+3. Secrets configurados no GitHub para autenticação e variáveis de ambiente
+
+### Configuração dos Secrets no GitHub
+
+Para que o workflow de deploy funcione corretamente, você precisa configurar os seguintes secrets no seu repositório GitHub:
+
+#### Credenciais do Google Cloud
+
+- `GCP_SA_KEY_PROD`: Chave de conta de serviço do Google Cloud em formato JSON para o ambiente de produção.
+
+#### Configurações do Banco de Dados
+
+- `DB_HOST_PROD`: Host do banco de dados PostgreSQL de produção
+- `DB_PORT_PROD`: Porta do banco de dados PostgreSQL de produção
+- `DB_USERNAME_PROD`: Nome de usuário do banco de dados PostgreSQL de produção
+- `DB_PASSWORD_PROD`: Senha do banco de dados PostgreSQL de produção
+- `DB_DATABASE_PROD`: Nome do banco de dados PostgreSQL de produção
+
+#### Configurações da Aplicação
+
+- `JWT_SECRET_PROD`: Chave secreta para geração de tokens JWT no ambiente de produção
+- `CORS_ORIGIN_PROD`: Lista de origens permitidas para CORS (separadas por vírgula)
+
+### Como criar uma nova release e acionar o deploy
+
+O deploy é acionado automaticamente quando uma nova tag com prefixo 'v' é criada. Para criar uma nova tag e acionar o deploy, você pode usar os scripts de release já configurados no projeto:
+
+```bash
+# Release de correção de bugs (incrementa o patch)
+pnpm release:patch "Corrige bug no cálculo de horas extras"
+
+# Release com novas funcionalidades (incrementa o minor)
+pnpm release:minor "Adiciona funcionalidade de relatórios"
+
+# Release com mudanças incompatíveis (incrementa o major)
+pnpm release:major "Refatora API com nova estrutura"
+```
+
+O script de release automaticamente cria a tag e a envia para o repositório, acionando o workflow de deploy.
 
 ## Tecnologias
 

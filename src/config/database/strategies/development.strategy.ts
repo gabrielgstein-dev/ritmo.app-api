@@ -5,7 +5,6 @@ import { DatabaseConnectionStrategy } from '../database-connection.strategy';
 export class DevelopmentDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     const baseOptions = this.getBaseOptions();
-    console.log('Conectando ao banco de dados de desenvolvimento local');
     
     return {
       ...baseOptions,

@@ -6,8 +6,6 @@ export class ProductionDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     const baseOptions = this.getBaseOptions();
     if (process.env.DB_SOCKET_PATH) {
-      console.log('Conectando ao banco de dados de produção via Cloud SQL socket');
-      
       return {
         ...baseOptions,
         host: process.env.DB_SOCKET_PATH,
@@ -16,8 +14,6 @@ export class ProductionDatabaseStrategy implements DatabaseConnectionStrategy {
         },
       } as PostgresConnectionOptions;
     } else {
-      console.log('Conectando ao banco de dados de produção via TCP/IP');
-      
       return {
         ...baseOptions,
         host: process.env.DB_HOST,

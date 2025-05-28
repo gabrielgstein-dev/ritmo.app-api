@@ -5,7 +5,6 @@ import { DatabaseConnectionStrategy } from '../database-connection.strategy';
 export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     const baseOptions = this.getBaseOptions();
-    console.log('Conectando ao banco de dados de QA no Render');
     
     return {
       ...baseOptions,

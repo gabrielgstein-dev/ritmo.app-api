@@ -1,0 +1,48 @@
+name: Deploy to Render - QA
+
+on:
+  push:
+    branches:
+      - hml
+
+env:
+  NODE_ENV: qa # Ambiente de QA para Render
+  PORT: 10000
+  
+  # Configurações do Banco de Dados PostgreSQL
+  DB_HOST: ${{ secrets.DB_HOST_QA }}
+  DB_PORT: ${{ secrets.DB_PORT_QA }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME_QA }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD_QA }}
+  DB_DATABASE: ${{ secrets.DB_DATABASE_QA }}
+  
+  # Configurações de Migrations e Sincronização
+  DB_SYNCHRONIZE: true
+  DB_MIGRATIONS_RUN: true
+  
+  # Configurações da Aplicação
+  JWT_SECRET: ${{ secrets.JWT_SECRET_QA }}
+  JWT_EXPIRATION: 1d
+  
+  # Configurações de CORS
+  CORS_ORIGIN: ${{ secrets.CORS_ORIGIN_QA }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID_QA }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-deploy: true

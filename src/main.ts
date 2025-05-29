@@ -1,4 +1,3 @@
-
 import './polyfills';
 
 import { NestFactory } from '@nestjs/core';
@@ -6,8 +5,27 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Mostrar todas as variáveis de ambiente no início da aplicação
+  console.log('=== VARIÁVEIS DE AMBIENTE ===');
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`PORT: ${process.env.PORT}`);
+  console.log(
+    `DATABASE_URL: ${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 25) + '...' : 'Não definida'}`,
+  );
+  console.log(
+    `INTERNAL_DATABASE_URL: ${process.env.INTERNAL_DATABASE_URL ? process.env.INTERNAL_DATABASE_URL.substring(0, 25) + '...' : 'Não definida'}`,
+  );
+  console.log(`DB_SYNCHRONIZE: ${process.env.DB_SYNCHRONIZE}`);
+  console.log(`DB_MIGRATIONS_RUN: ${process.env.DB_MIGRATIONS_RUN}`);
+  console.log(`DB_SSL: ${process.env.DB_SSL}`);
+  console.log(
+    `JWT_SECRET: ${process.env.JWT_SECRET ? '[DEFINIDO]' : 'Não definido'}`,
+  );
+  console.log(`JWT_EXPIRATION: ${process.env.JWT_EXPIRATION}`);
+  console.log(`CORS_ORIGIN: ${process.env.CORS_ORIGIN}`);
+  console.log('============================');
 
+  const app = await NestFactory.create(AppModule);
 
   app.enableCors({
     origin: process.env.CORS_ORIGIN
@@ -22,7 +40,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-
   const config = new DocumentBuilder()
     .setTitle('API de Cálculo de Tempo')
     .setDescription(
@@ -34,10 +51,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-
   // Garantir que a aplicação escute na porta fornecida pelo Render
   const port = process.env.PORT || 3001;
-  
   // Importante: No Render, precisamos escutar em 0.0.0.0 para aceitar conexões externas
   await app.listen(port, '0.0.0.0');
 

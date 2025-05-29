@@ -6,6 +6,19 @@ console.log(`Data e hora: ${new Date().toISOString()}`);
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`PORT: ${process.env.PORT}`);
 
+// Definir explicitamente a URL interna do banco de dados se não estiver definida
+if (!process.env.INTERNAL_DATABASE_URL) {
+  process.env.INTERNAL_DATABASE_URL = 'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb';
+  console.log('URL interna do banco de dados definida manualmente');
+}
+
+// Verificar se a URL do banco de dados contém o domínio .oregon-postgres.render.com
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('.oregon-postgres.render.com')) {
+  const originalUrl = process.env.DATABASE_URL;
+  process.env.DATABASE_URL = originalUrl.replace('.oregon-postgres.render.com', '');
+  console.log(`URL do banco de dados convertida para formato interno`);
+}
+
 // Carregar a aplicação NestJS compilada
 const { NestFactory } = require('@nestjs/core');
 const { AppModule } = require('./dist/app.module');

@@ -11,16 +11,29 @@ services:
     # Configuração para aumentar o tempo de espera antes de considerar o serviço como falho
     healthCheckTimeout: 300
     # Configuração para aumentar o tempo de inicialização permitido e executar verificações de pré-deploy
-    initialDeployHook: node render-env-setup.js && node pre-deploy-check.js && sleep 10
+    initialDeployHook: node render-env-setup.js && node pre-deploy-check.js && node test-render-db.js && sleep 10
     envVars:
       - key: NODE_ENV
         value: qa
       - key: PORT
         value: 10000
+      # URL externa do banco de dados (para conexões de fora do Render)
       - key: DATABASE_URL
-        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
+        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb
+      # URL interna do banco de dados (para conexões dentro do Render)
       - key: INTERNAL_DATABASE_URL
         value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
+      # Informações individuais do banco de dados
+      - key: DB_HOST
+        value: dpg-d0reskumcj7s7387b6t0-a
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_USERNAME
+        value: ritmodb_user
+      - key: DB_PASSWORD
+        value: mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp
+      - key: DB_DATABASE
+        value: ritmodb
       - key: DB_SYNCHRONIZE
         value: "true"
       - key: DB_MIGRATIONS_RUN

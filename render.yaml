@@ -11,7 +11,7 @@ services:
     # Configuração para aumentar o tempo de espera antes de considerar o serviço como falho
     healthCheckTimeout: 300
     # Configuração para aumentar o tempo de inicialização permitido e executar verificações de pré-deploy
-    initialDeployHook: node pre-deploy-check.js && sleep 10
+    initialDeployHook: node render-env-setup.js && node pre-deploy-check.js && sleep 10
     envVars:
       - key: NODE_ENV
         value: qa

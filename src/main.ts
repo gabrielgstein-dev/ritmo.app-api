@@ -3,6 +3,15 @@ import './polyfills';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { config } from 'dotenv';
+
+// Garantir que as variáveis de ambiente sejam carregadas corretamente
+const env = process.env.NODE_ENV || 'development';
+const envFile = env === 'production' ? '.env' : `.env.${env}`;
+
+// Carregar as variáveis de ambiente do arquivo correto
+console.log(`Carregando variáveis de ambiente do arquivo: ${envFile}`);
+config({ path: envFile });
 
 async function bootstrap() {
   // Mostrar todas as variáveis de ambiente no início da aplicação

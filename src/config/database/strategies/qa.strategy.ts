@@ -10,11 +10,16 @@ export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
       process.env.DATABASE_URL ||
       'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb';
 
-    console.log('Conectando ao banco de dados com URL:', dbUrl);
-    console.log('NODE_ENV:', process.env.NODE_ENV);
+    // Logs detalhados para depuração
+    console.log('=== Configuração de Banco de Dados (QA) ===');
+    console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`Usando URL de banco: ${dbUrl.substring(0, 20)}...`);
+    console.log(`DB_SYNCHRONIZE: ${process.env.DB_SYNCHRONIZE}`);
+    console.log(`DB_MIGRATIONS_RUN: ${process.env.DB_MIGRATIONS_RUN}`);
+    console.log(`DB_SSL: ${process.env.DB_SSL}`);
     
     // Configurações de conexão para o PostgreSQL no Render
-    return {
+    const options: PostgresConnectionOptions = {
       type: 'postgres',
       url: dbUrl,
       entities: [__dirname + '/../../../**/*.entity{.ts,.js}'],
@@ -25,13 +30,15 @@ export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
         rejectUnauthorized: false
       },
       extra: {
-        // Configurações adicionais para melhorar a conexão
-        max: 20, // Máximo de conexões no pool
-        connectionTimeoutMillis: 30000, // Timeout de conexão: 30 segundos
-        query_timeout: 10000, // Timeout de query: 10 segundos
-        idle_in_transaction_session_timeout: 10000, // Timeout de transação: 10 segundos
+        // Configurações otimizadas para o Render
+        max: 10, // Reduzir o número máximo de conexões para evitar sobrecarga
+        connectionTimeoutMillis: 60000, // Aumentar timeout de conexão: 60 segundos
+        query_timeout: 30000, // Aumentar timeout de query: 30 segundos
+        idle_in_transaction_session_timeout: 30000, // Aumentar timeout de transação: 30 segundos
       },
-      logging: ['error', 'warn', 'info', 'log'],
-    } as PostgresConnectionOptions;
+      logging: ['error', 'warn', 'info'],
+    };
+    console.log('Configuração de banco de dados carregada com sucesso');
+    return options;
   }
 }

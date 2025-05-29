@@ -5,6 +5,13 @@ services:
     branch: hml
     buildCommand: npm install && npm run build
     startCommand: npm run start:prod
+    plan: free
+    # Importante: Configuração para garantir que o Render detecte a porta corretamente
+    healthCheckPath: /api/docs
+    # Configuração para aumentar o tempo de espera antes de considerar o serviço como falho
+    healthCheckTimeout: 300
+    # Configuração para aumentar o tempo de inicialização permitido
+    initialDeployHook: sleep 10
     envVars:
       - key: NODE_ENV
         value: qa
@@ -13,9 +20,11 @@ services:
       - key: DATABASE_URL
         value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb
       - key: DB_SYNCHRONIZE
-        value: true
+        value: "true"
       - key: DB_MIGRATIONS_RUN
-        value: true
+        value: "true"
+      - key: DB_SSL
+        value: "true"
       - key: JWT_SECRET
         fromGroup: qa-secrets
       - key: JWT_EXPIRATION

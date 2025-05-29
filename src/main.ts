@@ -35,10 +35,20 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
 
+  // Garantir que a aplicação escute na porta fornecida pelo Render
   const port = process.env.PORT || 3001;
-  await app.listen(port);
+  
+  // Importante: No Render, precisamos escutar em 0.0.0.0 para aceitar conexões externas
+  await app.listen(port, '0.0.0.0');
 
   console.log(`Aplicação rodando na porta ${port}`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(
+    `Database URL: ${process.env.DATABASE_URL ? 'Configurada' : 'Não configurada'}`,
+  );
+  console.log(
+    `Internal Database URL: ${process.env.INTERNAL_DATABASE_URL ? 'Configurada' : 'Não configurada'}`,
+  );
   console.log(
     `Documentação Swagger disponível em: http://localhost:${port}/api/docs`,
   );

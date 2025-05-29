@@ -11,14 +11,14 @@ services:
     # Configuração para aumentar o tempo de espera antes de considerar o serviço como falho
     healthCheckTimeout: 300
     # Configuração para aumentar o tempo de inicialização permitido
-    initialDeployHook: sleep 10
+    initialDeployHook: sleep 20
     envVars:
       - key: NODE_ENV
         value: qa
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb
+        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
       - key: INTERNAL_DATABASE_URL
         value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
       - key: DB_SYNCHRONIZE

@@ -5,7 +5,7 @@ import { DatabaseConnectionStrategy } from '../database-connection.strategy';
 export class DevelopmentDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     const baseOptions = this.getBaseOptions();
-    
+
     return {
       ...baseOptions,
       host: process.env.DB_HOST,

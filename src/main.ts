@@ -5,34 +5,11 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { config } from 'dotenv';
 
-// Garantir que as variáveis de ambiente sejam carregadas corretamente
 const env = process.env.NODE_ENV || 'development';
 const envFile = env === 'production' ? '.env' : `.env.${env}`;
-
-// Carregar as variáveis de ambiente do arquivo correto
-console.log(`Carregando variáveis de ambiente do arquivo: ${envFile}`);
 config({ path: envFile });
 
 async function bootstrap() {
-  // Mostrar todas as variáveis de ambiente no início da aplicação
-  console.log('=== VARIÁVEIS DE AMBIENTE ===');
-  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`PORT: ${process.env.PORT}`);
-  console.log(
-    `DATABASE_URL: ${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 25) + '...' : 'Não definida'}`,
-  );
-  console.log(
-    `INTERNAL_DATABASE_URL: ${process.env.INTERNAL_DATABASE_URL ? process.env.INTERNAL_DATABASE_URL.substring(0, 25) + '...' : 'Não definida'}`,
-  );
-  console.log(`DB_SYNCHRONIZE: ${process.env.DB_SYNCHRONIZE}`);
-  console.log(`DB_MIGRATIONS_RUN: ${process.env.DB_MIGRATIONS_RUN}`);
-  console.log(`DB_SSL: ${process.env.DB_SSL}`);
-  console.log(
-    `JWT_SECRET: ${process.env.JWT_SECRET ? '[DEFINIDO]' : 'Não definido'}`,
-  );
-  console.log(`JWT_EXPIRATION: ${process.env.JWT_EXPIRATION}`);
-  console.log(`CORS_ORIGIN: ${process.env.CORS_ORIGIN}`);
-  console.log('============================');
 
   const app = await NestFactory.create(AppModule);
 
@@ -40,11 +17,11 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN
       ? process.env.CORS_ORIGIN.split(',')
       : [
-          'http://localhost:3000',
-          'https://ponto-frontend.onrender.com',
-          'https://ritmo-app-web.vercel.app',
-          'https://ritmo.click',
-        ],
+        'http://localhost:3000',
+        'https://ponto-frontend.onrender.com',
+        'https://ritmo-app-web.vercel.app',
+        'https://ritmo.click',
+      ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });

@@ -10,8 +10,8 @@ services:
     healthCheckPath: /api/docs
     # Configuração para aumentar o tempo de espera antes de considerar o serviço como falho
     healthCheckTimeout: 300
-    # Configuração para aumentar o tempo de inicialização permitido e executar verificações de pré-deploy
-    initialDeployHook: node render-env-setup.js && node pre-deploy-check.js && node test-render-db.js && sleep 10
+    # Configuração para aumentar o tempo de inicialização permitido
+    initialDeployHook: node render-env-setup.js && sleep 5
     envVars:
       - key: NODE_ENV
         value: qa

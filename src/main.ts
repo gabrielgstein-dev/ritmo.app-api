@@ -61,12 +61,18 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   // Garantir que a aplicação escute na porta fornecida pelo Render
-  const port = process.env.PORT || 3001;
+  // No Render, é CRUCIAL usar a variável de ambiente PORT fornecida pelo Render
+  const port = parseInt(process.env.PORT || '3001', 10);
+  
   // Importante: No Render, precisamos escutar em 0.0.0.0 para aceitar conexões externas
+  console.log(`Tentando iniciar o servidor na porta ${port} e host 0.0.0.0...`);
   await app.listen(port, '0.0.0.0');
 
+  // Logs detalhados para ajudar na depuração
   console.log(`Aplicação rodando na porta ${port}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`Porta: ${port}`);
+  console.log(`Host: 0.0.0.0`);
   console.log(
     `Database URL: ${process.env.DATABASE_URL ? 'Configurada' : 'Não configurada'}`,
   );
@@ -76,5 +82,8 @@ async function bootstrap() {
   console.log(
     `Documentação Swagger disponível em: http://localhost:${port}/api/docs`,
   );
+  
+  // Importante: Registrar que a aplicação está pronta para receber conexões
+  console.log('Servidor iniciado e pronto para receber conexões!');
 }
 bootstrap();

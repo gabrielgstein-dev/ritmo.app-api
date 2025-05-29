@@ -5,7 +5,17 @@ import { DatabaseConnectionStrategy } from '../database-connection.strategy';
 export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     // Priorizar a URL interna do Render, depois a URL externa, depois o fallback
-    const dbUrl = process.env.INTERNAL_DATABASE_URL || process.env.DATABASE_URL;
+    // No Render, é importante usar a URL interna para conexões entre serviços
+    // Formato correto para URL interna: postgresql://username:password@postgres-service/database
+    let dbUrl = process.env.INTERNAL_DATABASE_URL || process.env.DATABASE_URL;
+    
+    // Verificar se a URL contém o domínio .oregon-postgres.render.com e substituir por internal-postgres.render.com
+    // Esta é uma solução comum para problemas de conexão no Render
+    if (dbUrl && dbUrl.includes('.oregon-postgres.render.com')) {
+      const originalUrl = dbUrl;
+      dbUrl = dbUrl.replace('.oregon-postgres.render.com', '');
+      console.log(`Modificando URL do banco de dados de ${originalUrl.substring(0, 30)}... para ${dbUrl.substring(0, 30)}...`);
+    }
     // Verificar se estamos usando a URL interna do Render
     const isInternalUrl =
       dbUrl.includes('@dpg-') && !dbUrl.includes('.oregon-postgres.render.com');

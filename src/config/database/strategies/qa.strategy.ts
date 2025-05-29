@@ -8,10 +8,11 @@ export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
     const dbUrl =
       process.env.INTERNAL_DATABASE_URL ||
       process.env.DATABASE_URL ||
-      'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb';
-      
+      'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb';
+
     // Verificar se estamos usando a URL interna do Render
-    const isInternalUrl = dbUrl.includes('@dpg-') && !dbUrl.includes('.oregon-postgres.render.com');
+    const isInternalUrl =
+      dbUrl.includes('@dpg-') && !dbUrl.includes('.oregon-postgres.render.com');
 
     // Logs detalhados para depuração
     console.log('=== Configuração de Banco de Dados (QA) ===');
@@ -23,7 +24,7 @@ export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
     console.log(`DB_SSL: ${process.env.DB_SSL}`);
     console.log(`Hostname do banco: ${new URL(dbUrl).hostname}`);
     console.log(`Tentando conectar ao banco de dados...`);
-    
+
     // Configurações de conexão para o PostgreSQL no Render
     const options: PostgresConnectionOptions = {
       type: 'postgres',
@@ -33,9 +34,13 @@ export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
       migrationsRun: process.env.DB_MIGRATIONS_RUN === 'true',
       // Configuração de SSL adaptada para URLs internas e externas
-      ssl: process.env.DB_SSL === 'false' ? false : {
-        rejectUnauthorized: false
-      },
+      ssl:
+        process.env.DB_SSL === 'false'
+          ? false
+          : {
+              rejectUnauthorized: false,
+            },
+
       // Adicionar logs para depuração da conexão
       logging: true,
       extra: {

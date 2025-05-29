@@ -5,42 +5,40 @@ import { DatabaseConnectionStrategy } from '../database-connection.strategy';
 export class QaDatabaseStrategy implements DatabaseConnectionStrategy {
   getConnectionOptions(): DataSourceOptions {
     // No Render, quando o banco de dados e o serviço web estão no mesmo ambiente,
-    // devemos usar a URL interna para melhor conectividade
-    // URL interna fornecida pelo Render: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
+    // vamos usar os parâmetros individuais de conexão em vez da URL completa
     
-    // Definir a URL do banco de dados, priorizando a URL interna
-    let dbUrl = process.env.INTERNAL_DATABASE_URL || 'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb';
+    // Definir os parâmetros de conexão com o banco de dados
+    const dbHost = process.env.DB_HOST || 'dpg-d0reskumcj7s7387b6t0-a';
+    const dbPort = parseInt(process.env.DB_PORT || '5432', 10);
+    const dbUsername = process.env.DB_USERNAME || 'ritmodb_user';
+    const dbPassword = process.env.DB_PASSWORD || 'mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp';
+    const dbDatabase = process.env.DB_DATABASE || 'ritmodb';
     
-    // Verificar se estamos usando a URL externa e convertê-la para interna
-    if (dbUrl && dbUrl.includes('.oregon-postgres.render.com')) {
-      const originalUrl = dbUrl;
-      dbUrl = dbUrl.replace('.oregon-postgres.render.com', '');
-      console.log(`Convertendo URL externa para interna: ${originalUrl.substring(0, 30)}... -> ${dbUrl.substring(0, 30)}...`);
-    }
-    // Verificar se estamos usando a URL interna do Render
-    const isInternalUrl =
-      dbUrl.includes('@dpg-') && !dbUrl.includes('.oregon-postgres.render.com');
-
     // Logs detalhados para depuração
     console.log('=== Configuração de Banco de Dados (QA) ===');
     console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-    console.log(`Usando URL de banco: ${dbUrl.substring(0, 20)}...`);
-    console.log(`É URL interna do Render? ${isInternalUrl ? 'Sim' : 'Não'}`);
+    console.log(`Host: ${dbHost}`);
+    console.log(`Port: ${dbPort}`);
+    console.log(`Database: ${dbDatabase}`);
+    console.log(`Username: ${dbUsername}`);
     console.log(`DB_SYNCHRONIZE: ${process.env.DB_SYNCHRONIZE}`);
     console.log(`DB_MIGRATIONS_RUN: ${process.env.DB_MIGRATIONS_RUN}`);
     console.log(`DB_SSL: ${process.env.DB_SSL}`);
-    console.log(`Hostname do banco: ${new URL(dbUrl).hostname}`);
-    console.log(`Tentando conectar ao banco de dados...`);
+    console.log(`Tentando conectar ao banco de dados usando parâmetros individuais...`);
 
-    // Configurações de conexão para o PostgreSQL no Render
+    // Configurações de conexão para o PostgreSQL no Render usando parâmetros individuais
     const options: PostgresConnectionOptions = {
       type: 'postgres',
-      url: dbUrl,
+      host: dbHost,
+      port: dbPort,
+      username: dbUsername,
+      password: dbPassword,
+      database: dbDatabase,
       entities: [__dirname + '/../../../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/../../../migrations/**/*{.ts,.js}'],
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
       migrationsRun: process.env.DB_MIGRATIONS_RUN === 'true',
-      // Configuração de SSL adaptada para URLs internas e externas
+      // Configuração de SSL adaptada para conexões no Render
       ssl:
         process.env.DB_SSL === 'false'
           ? false

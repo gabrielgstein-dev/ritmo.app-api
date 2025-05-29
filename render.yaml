@@ -16,24 +16,27 @@ services:
       - key: NODE_ENV
         value: qa
       - key: PORT
-        value: 10000
-      # URL externa do banco de dados (para conexões de fora do Render)
-      - key: DATABASE_URL
-        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a.oregon-postgres.render.com/ritmodb
-      # URL interna do banco de dados (para conexões dentro do Render)
-      - key: INTERNAL_DATABASE_URL
-        value: postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb
-      # Informações individuais do banco de dados
+        value: 3000
       - key: DB_HOST
-        value: dpg-d0reskumcj7s7387b6t0-a
+        fromDatabase:
+          name: ritmodb
+          property: host
       - key: DB_PORT
-        value: "5432"
+        fromDatabase:
+          name: ritmodb
+          property: port
       - key: DB_USERNAME
-        value: ritmodb_user
+        fromDatabase:
+          name: ritmodb
+          property: user
       - key: DB_PASSWORD
-        value: mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp
+        fromDatabase:
+          name: ritmodb
+          property: password
       - key: DB_DATABASE
-        value: ritmodb
+        fromDatabase:
+          name: ritmodb
+          property: database
       - key: DB_SYNCHRONIZE
         value: "true"
       - key: DB_MIGRATIONS_RUN

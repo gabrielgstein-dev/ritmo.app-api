@@ -6,18 +6,39 @@ console.log(`Data e hora: ${new Date().toISOString()}`);
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`PORT: ${process.env.PORT}`);
 
-// Definir explicitamente a URL interna do banco de dados se não estiver definida
-if (!process.env.INTERNAL_DATABASE_URL) {
-  process.env.INTERNAL_DATABASE_URL = 'postgresql://ritmodb_user:mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp@dpg-d0reskumcj7s7387b6t0-a/ritmodb';
-  console.log('URL interna do banco de dados definida manualmente');
+// Definir explicitamente os parâmetros de conexão com o banco de dados se não estiverem definidos
+if (!process.env.DB_HOST) {
+  process.env.DB_HOST = 'dpg-d0reskumcj7s7387b6t0-a';
+  console.log('Host do banco de dados definido manualmente');
 }
 
-// Verificar se a URL do banco de dados contém o domínio .oregon-postgres.render.com
-if (process.env.DATABASE_URL && process.env.DATABASE_URL.includes('.oregon-postgres.render.com')) {
-  const originalUrl = process.env.DATABASE_URL;
-  process.env.DATABASE_URL = originalUrl.replace('.oregon-postgres.render.com', '');
-  console.log(`URL do banco de dados convertida para formato interno`);
+if (!process.env.DB_PORT) {
+  process.env.DB_PORT = '5432';
+  console.log('Porta do banco de dados definida manualmente');
 }
+
+if (!process.env.DB_USERNAME) {
+  process.env.DB_USERNAME = 'ritmodb_user';
+  console.log('Usuário do banco de dados definido manualmente');
+}
+
+if (!process.env.DB_PASSWORD) {
+  process.env.DB_PASSWORD = 'mO3C7prhkLyfshsO6Qt5vz26A9rK7iQp';
+  console.log('Senha do banco de dados definida manualmente');
+}
+
+if (!process.env.DB_DATABASE) {
+  process.env.DB_DATABASE = 'ritmodb';
+  console.log('Nome do banco de dados definido manualmente');
+}
+
+// Exibir informações de conexão com o banco de dados
+console.log('=== Informações de conexão com o banco de dados ===');
+console.log(`Host: ${process.env.DB_HOST}`);
+console.log(`Port: ${process.env.DB_PORT}`);
+console.log(`Database: ${process.env.DB_DATABASE}`);
+console.log(`Username: ${process.env.DB_USERNAME}`);
+
 
 // Carregar a aplicação NestJS compilada
 const { NestFactory } = require('@nestjs/core');
